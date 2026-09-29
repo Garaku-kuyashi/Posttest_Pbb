@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 
-// ============================================================
-// Model data produk (bukan widget)
-// ============================================================
+
 class Product {
   final String name;
   final String category;
   final String price;
   final String rating;
-  final IconData icon;
+  final String imageUrl;
 
   const Product({
     required this.name,
     required this.category,
     required this.price,
     required this.rating,
-    required this.icon,
+    required this.imageUrl,
   });
 }
 
-// ============================================================
-// Model data kategori (bukan widget)
-// ============================================================
+// Model data kategori 
 class Kategori {
   final String name;
   final IconData icon;
@@ -29,61 +25,101 @@ class Kategori {
   const Kategori({required this.name, required this.icon});
 }
 
-// ============================================================
-// Daftar kategori untuk chip di homepage
-// ============================================================
+// Model data item keranjang 
+class CartItem {
+  final String name;
+  final String description;
+  final int price;
+  final String imageUrl;
+  int quantity;
+
+  CartItem({
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.imageUrl,
+    this.quantity = 1,
+  });
+}
+
+// Fungsi bantuan untuk mengubah angka menjadi format rupiah contoh: 520000 menjadi "Rp520.000"
+String formatRupiah(int angka) {
+  final teksAngka = angka.toString();
+  final buffer = StringBuffer();
+  for (int i = 0; i < teksAngka.length; i++) {
+    final posisiDariKanan = teksAngka.length - i;
+    buffer.write(teksAngka[i]);
+    if (posisiDariKanan > 1 && posisiDariKanan % 3 == 1) {
+      buffer.write('.');
+    }
+  }
+  return 'Rp$buffer';
+}
+
+// Daftar kategori untuk baris kategori di homepage
 const List<Kategori> daftarKategori = [
-  Kategori(name: 'Semua', icon: Icons.apps),
   Kategori(name: 'Figure', icon: Icons.toys),
   Kategori(name: 'Apparel', icon: Icons.checkroom),
   Kategori(name: 'Poster', icon: Icons.image),
   Kategori(name: 'Aksesoris', icon: Icons.key),
 ];
 
-// ============================================================
 // Daftar produk yang ditampilkan di homepage
-// ============================================================
 const List<Product> daftarProduct = [
   Product(
-    name: 'Figure Sorasaki Hina',
+    name: 'Nendroid Korone',
     category: 'Figure',
     price: 'Rp520.000',
     rating: '4.9',
-    icon: Icons.toys,
+    imageUrl: 'assets/korone.jpg',
   ),
   Product(
-    name: 'Hoodie Kiana Kaslana HI3',
+    name: 'Hoodie Anime Attack On Titan',
     category: 'Apparel',
     price: 'Rp310.000',
     rating: '4.8',
-    icon: Icons.checkroom,
+    imageUrl: 'assets/hoodie.jpg',
   ),
   Product(
-    name: 'Poster Plana Blue Archive',
-    category: 'Poster',
-    price: 'Rp85.000',
-    rating: '4.7',
-    icon: Icons.image,
-  ),
-  Product(
-    name: 'Keychain Acrylic Arknight',
+    name: 'Acrylic Stand Camile Arknights:Endfield',
     category: 'Aksesoris',
     price: 'Rp35.000',
     rating: '4.9',
-    icon: Icons.key,
+    imageUrl: 'assets/acrlik.jpg',
   ),
   Product(
-    name: 'Tote Bag Genshin Impact',
+    name: 'Totebag One Piece',
     category: 'Apparel',
     price: 'Rp120.000',
     rating: '4.6',
-    icon: Icons.shopping_bag,
+    imageUrl: 'totebag.jpg',
   ),
   Product(
-    name: 'Mousepad Sakura XL',
+    name: 'Mousepad Hatsune Miku XL',
     category: 'Aksesoris',
     price: 'Rp150.000',
     rating: '4.8',
-    icon: Icons.mouse,
+    imageUrl: 'mouse.jpg',
+  ),
+];
+
+List<CartItem> daftarKeranjang = [
+  CartItem(
+    name: 'Nendroid Korone',
+    description: 'Nendroid, tinggi 10 cm',
+    price: 520000,
+    imageUrl: 'assets/korone.jpg',
+  ),
+  CartItem(
+    name: 'Hoodie Anime Attack On Titan',
+    description: 'Bahan fleece, ukuran L',
+    price: 310000,
+    imageUrl: 'assets/hoodie.jpg',
+  ),
+  CartItem(
+    name: 'Acrylic Stand Camile Arknights:Endfield',
+    description: 'Akrilik 5 cm',
+    price: 35000,
+    imageUrl: 'assets/acrlik.jpg',
   ),
 ];

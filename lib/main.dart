@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-// Mengimpor halaman dari folder Desain
-import 'desain/desain.dart';
+import 'Desain/desain.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,13 +12,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // MaterialApp: widget wrapper utama dari aplikasi Flutter
     return MaterialApp(
-      // nama aplikasi
+      // title: nama aplikasi (String)
       title: 'Toko Merch Anime',
       // debugShowCheckedModeBanner: menonaktifkan tulisan debug di pojok kanan atas
       debugShowCheckedModeBanner: false,
       // theme: aturan visual umum aplikasi
       theme: ThemeData(
-        // colorScheme: skema warna dibuat dari satu warna dasar 
+        // colorScheme: skema warna dibuat dari satu warna dasar (seed)
         colorScheme: ColorScheme.fromSeed(seedColor: warnaAksen),
         // scaffoldBackgroundColor: warna latar default seluruh halaman
         scaffoldBackgroundColor: Colors.white,

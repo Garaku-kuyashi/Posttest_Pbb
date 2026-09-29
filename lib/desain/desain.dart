@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-// Mengimpor model dan data produk dari folder Product
 import '../product/product.dart';
+import 'cart_page.dart';
+import 'profile_page.dart';
 
-// ============================================================
-// warna tema 
-// ============================================================
 const Color warnaAksen = Color(0xFFFF7A00);
 const Color warnaLatar = Colors.white;
 const Color warnaAbuMuda = Color(0xFFF5F5F5);
 
-// ============================================================
-// halaman utama
-// ============================================================
+// HomePage : halaman utama
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -21,36 +17,42 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       // backgroundColor: warna latar halaman
       backgroundColor: warnaLatar,
-
       // appBar: bar di bagian atas halaman
       appBar: AppBar(
         backgroundColor: warnaAksen,
         elevation: 0,
         // Text: judul aplikasi
         title: const Text(
-          'My Hobby Store',
+          'Toko Merch Anime',
           // TextStyle: mengatur gaya teks judul
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
 
-
+      // konten utama halaman
+      // SafeArea: memastikan konten tidak tertutup area perangkat
       body: SafeArea(
+        // SingleChildScrollView: membuat halaman bisa di-scroll (1 child)
         child: SingleChildScrollView(
+          // scrollDirection: arah scrolling halaman
           scrollDirection: Axis.vertical,
+          // Padding: ruang di sekeliling seluruh konten
           child: Padding(
+            // EdgeInsets.symmetric: jarak kiri-kanan 16, atas-bawah 12
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            // Column: menyusun semua bagian secara vertikal
             child: Column(
+              // crossAxisAlignment: seluruh anak rata kiri
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ---------- SEARCH BAR ----------
                 // TextField: input pencarian produk
                 TextField(
+                  // decoration: tampilan field lewat InputDecoration
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: warnaAbuMuda,
                     // hintText: placeholder pada input
-                    hintText: 'Cari merch anime sesuai hobby mu :)',
+                    hintText: 'Cari merch anime',
                     // hintStyle: gaya teks placeholder
                     hintStyle: TextStyle(color: Colors.grey.shade500),
                     // suffixIcon: icon di ujung kanan field
@@ -72,18 +74,63 @@ class HomePage extends StatelessWidget {
                 ),
 
                 // SizedBox: jarak vertikal antar bagian
+                const SizedBox(height: 16),
+
+                // banner promo
+                // Container: banner warna polos dengan sudut melengkung
+                Container(
+                  width: double.infinity,
+                  // EdgeInsets.all: jarak di dalam banner
+                  padding: const EdgeInsets.all(16),
+                  // BoxDecoration: warna latar dan kelengkungan
+                  decoration: BoxDecoration(
+                    color: warnaAksen,
+                    // borderRadius: kelengkungan sudut banner
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  // Column: dua baris teks promo
+                  child: const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Text: judul promo
+                      Text(
+                        'Diskon Spesial 30%',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      // SizedBox: jarak antar teks
+                      SizedBox(height: 4),
+                      // Text: keterangan promo
+                      Text(
+                        'Untuk semua produk merch edisi terbatas',
+                        style: TextStyle(color: Colors.white, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 20),
 
-                // ---------- KATEGORI ----------
+                // Kategori
                 // Row: pilihan kategori sejajar horizontal
                 Row(
                   children: const [
                     // Expanded: setiap kategori membagi lebar sama rata
-                    Expanded(child: KategoriItem(nama: 'Figure', icon: Icons.toys)),
                     Expanded(
-                      child: KategoriItem(nama: 'Apparel', icon: Icons.checkroom),
+                      child: KategoriItem(nama: 'Figure', icon: Icons.toys),
                     ),
-                    Expanded(child: KategoriItem(nama: 'Poster', icon: Icons.image)),
+                    Expanded(
+                      child: KategoriItem(
+                        nama: 'Apparel',
+                        icon: Icons.checkroom,
+                      ),
+                    ),
+                    Expanded(
+                      child: KategoriItem(nama: 'Poster', icon: Icons.image),
+                    ),
                     Expanded(
                       child: KategoriItem(nama: 'Aksesoris', icon: Icons.key),
                     ),
@@ -92,7 +139,6 @@ class HomePage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // ---------- JUDUL SECTION ----------
                 // Text: judul daftar produk
                 const Text(
                   'Semua Produk',
@@ -100,6 +146,7 @@ class HomePage extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 12),
+
                 // Setiap baris berisi 2 produk (dibuat dari Row + Expanded)
                 for (int i = 0; i < daftarProduct.length; i += 2)
                   // Padding: jarak bawah antar baris produk
@@ -135,25 +182,81 @@ class HomePage extends StatelessWidget {
         currentIndex: 0,
         selectedItemColor: warnaAksen,
         unselectedItemColor: Colors.grey,
-        items: const [
+        // onTap: dipanggil setiap kali salah satu menu ditekan
+        onTap: (index) {
+          if (index == 1) {
+            // Navigator.push: membuka halaman CartPage di atas HomePage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CartPage()),
+            );
+          } else if (index == 2) {
+            // Navigator.push: membuka halaman ProfilePage di atas HomePage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfilePage()),
+            );
+          }
+          // index == 0 (Beranda) tidak melakukan apa-apa karena sudah di halaman ini
+        },
+        items: [
           // Item menu Beranda
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-          // Item menu Keranjang
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Beranda',
+          ),
+          // Item menu Keranjang, iconnya diberi badge jumlah barang
           BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
+            // Stack: menumpuk icon keranjang dengan badge jumlah di sudutnya
+            icon: Stack(
+              // clipBehavior none: agar badge boleh sedikit keluar dari area icon
+              clipBehavior: Clip.none,
+              children: [
+                // Icon keranjang ditulis lebih dulu sehingga berada di belakang/dasar
+                const Icon(Icons.shopping_cart),
+                // Positioned: menaruh badge di pojok kanan atas icon keranjang
+                Positioned(
+                  right: -6,
+                  top: -4,
+                  // Container: lingkaran kecil berisi angka jumlah item
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      color: warnaAksen,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    // Text: menampilkan total jumlah item di keranjang
+                    child: Text(
+                      '${daftarKeranjang.length}',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             label: 'Keranjang',
           ),
           // Item menu Profil
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profil',
+          ),
         ],
       ),
     );
   }
 }
 
-// ============================================================
 // KategoriItem : satu ikon kategori dengan label di bawahnya
-// ============================================================
 class KategoriItem extends StatelessWidget {
   final String nama;
   final IconData icon;
@@ -188,9 +291,7 @@ class KategoriItem extends StatelessWidget {
   }
 }
 
-// ============================================================
 // ProductCard : card vertikal untuk satu produk
-// ============================================================
 class ProductCard extends StatelessWidget {
   final Product product;
 
@@ -198,45 +299,35 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Container: kotak card 
     return Container(
-      // BoxDecoration: mengatur bingkai dan kelengkungan card
       decoration: BoxDecoration(
-        // border: bingkai tipis di sekeliling card
         border: Border.all(color: Colors.grey.shade300),
-        // borderRadius: kelengkungan sudut card
         borderRadius: BorderRadius.circular(10),
       ),
-      // Column: gambar di atas, detail produk di bawah
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Container: placeholder gambar produk
-          Container(
-            width: double.infinity,
-            height: 100,
-            // alignment: icon ditempatkan di tengah kotak gambar
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: warnaAbuMuda,
-              // BorderRadius.vertical: hanya sudut atas yang melengkung
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(9),
+          // GAMBAR PRODUK
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(9),
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              height: 110,
+              child: Image.asset(
+                product.imageUrl,
+                fit: BoxFit.cover,
               ),
             ),
-            // Icon: gambar sementara sesuai jenis produk
-            child: Icon(product.icon, size: 40, color: Colors.grey.shade500),
           ),
 
-          // Padding: ruang di sekeliling detail produk
+          // Detail produk
           Padding(
-            // EdgeInsets.all: jarak sama di semua sisi
             padding: const EdgeInsets.all(8),
-            // Column: susunan detail produk
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // text: nama produk
                 Text(
                   product.name,
                   maxLines: 1,
@@ -246,22 +337,16 @@ class ProductCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                // SizedBox: jarak vertikal kecil
                 const SizedBox(height: 2),
-                // Text: kategori produk
                 Text(
                   product.category,
                   style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                 ),
                 const SizedBox(height: 4),
-                // Row: bintang dan rating
                 Row(
                   children: [
-                    // Icon: bintang rating
                     const Icon(Icons.star, size: 14, color: Colors.amber),
-                    // SizedBox: jarak antara bintang dan angka
                     const SizedBox(width: 4),
-                    // Text: nilai rating
                     Text(
                       product.rating,
                       style: TextStyle(
@@ -272,7 +357,6 @@ class ProductCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 4),
-                // Text: harga produk
                 Text(
                   product.price,
                   style: const TextStyle(
@@ -283,7 +367,7 @@ class ProductCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Container: tombol "Tambah ke Keranjang"
+                // Tombol Tambah
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 6),
@@ -291,10 +375,8 @@ class ProductCard extends StatelessWidget {
                     color: warnaAksen,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  // Text: label tombol
                   child: const Text(
                     'Tambah',
-                    // textAlign: teks diposisikan di tengah
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
