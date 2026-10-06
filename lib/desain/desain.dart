@@ -3,59 +3,77 @@ import '../product/product.dart';
 import 'cart_page.dart';
 import 'profile_page.dart';
 
+
 const Color warnaAksen = Color(0xFFFF7A00);
 const Color warnaLatar = Colors.white;
 const Color warnaAbuMuda = Color(0xFFF5F5F5);
 
-// HomePage : halaman utama
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  final List<Product> products;
+  final KeranjangController keranjang;
+
+  const HomePage({
+    super.key,
+    required this.products,
+    required this.keranjang,
+  });
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // searchQuery: state lokal, berubah setiap kali pengguna mengetik
+  String searchQuery = '';
+
+  // visibleProducts: daftar produk yang namanya mengandung searchQuery.
+  // Dihitung ulang setiap kali build() dipanggil (setelah setState),
+  // sama seperti contoh "visibleProducts" pada Modul 4.
+  List<Product> get visibleProducts {
+    return widget.products.where((product) {
+      return product.name.toLowerCase().contains(searchQuery);
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     // Scaffold: struktur dasar halaman aplikasi mobile
     return Scaffold(
-      // backgroundColor: warna latar halaman
       backgroundColor: warnaLatar,
-      // appBar: bar di bagian atas halaman
+
       appBar: AppBar(
         backgroundColor: warnaAksen,
         elevation: 0,
-        // Text: judul aplikasi
         title: const Text(
           'Toko Merch Anime',
-          // TextStyle: mengatur gaya teks judul
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
 
-      // konten utama halaman
-      // SafeArea: memastikan konten tidak tertutup area perangkat
       body: SafeArea(
-        // SingleChildScrollView: membuat halaman bisa di-scroll (1 child)
         child: SingleChildScrollView(
-          // scrollDirection: arah scrolling halaman
           scrollDirection: Axis.vertical,
-          // Padding: ruang di sekeliling seluruh konten
           child: Padding(
-            // EdgeInsets.symmetric: jarak kiri-kanan 16, atas-bawah 12
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            // Column: menyusun semua bagian secara vertikal
             child: Column(
-              // crossAxisAlignment: seluruh anak rata kiri
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // SEARCH BAR
                 // TextField: input pencarian produk
                 TextField(
-                  // decoration: tampilan field lewat InputDecoration
+                  // onChanged: dipanggil setiap kali pengguna mengetik,
+                  // lalu setState dipakai untuk mengubah searchQuery
+                  // (konsep Modul 4: "State pada TextField")
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value.toLowerCase();
+                    });
+                  },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: warnaAbuMuda,
-                    // hintText: placeholder pada input
                     hintText: 'Cari merch anime',
-                    // hintStyle: gaya teks placeholder
                     hintStyle: TextStyle(color: Colors.grey.shade500),
-                    // suffixIcon: icon di ujung kanan field
                     suffixIcon: Icon(
                       Icons.search,
                       color: Colors.grey.shade600,
@@ -73,26 +91,19 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
 
-                // SizedBox: jarak vertikal antar bagian
                 const SizedBox(height: 16),
 
-                // banner promo
-                // Container: banner warna polos dengan sudut melengkung
+                // BANNER PROMO
                 Container(
                   width: double.infinity,
-                  // EdgeInsets.all: jarak di dalam banner
                   padding: const EdgeInsets.all(16),
-                  // BoxDecoration: warna latar dan kelengkungan
                   decoration: BoxDecoration(
                     color: warnaAksen,
-                    // borderRadius: kelengkungan sudut banner
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  // Column: dua baris teks promo
                   child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Text: judul promo
                       Text(
                         'Diskon Spesial 30%',
                         style: TextStyle(
@@ -101,9 +112,7 @@ class HomePage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // SizedBox: jarak antar teks
                       SizedBox(height: 4),
-                      // Text: keterangan promo
                       Text(
                         'Untuk semua produk merch edisi terbatas',
                         style: TextStyle(color: Colors.white, fontSize: 13),
@@ -114,23 +123,14 @@ class HomePage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // Kategori
-                // Row: pilihan kategori sejajar horizontal
+                // KATEGORI
                 Row(
                   children: const [
-                    // Expanded: setiap kategori membagi lebar sama rata
+                    Expanded(child: KategoriItem(nama: 'Figure', icon: Icons.toys)),
                     Expanded(
-                      child: KategoriItem(nama: 'Figure', icon: Icons.toys),
+                      child: KategoriItem(nama: 'Apparel', icon: Icons.checkroom),
                     ),
-                    Expanded(
-                      child: KategoriItem(
-                        nama: 'Apparel',
-                        icon: Icons.checkroom,
-                      ),
-                    ),
-                    Expanded(
-                      child: KategoriItem(nama: 'Poster', icon: Icons.image),
-                    ),
+                    Expanded(child: KategoriItem(nama: 'Poster', icon: Icons.image)),
                     Expanded(
                       child: KategoriItem(nama: 'Aksesoris', icon: Icons.key),
                     ),
@@ -139,32 +139,55 @@ class HomePage extends StatelessWidget {
 
                 const SizedBox(height: 20),
 
-                // Text: judul daftar produk
-                const Text(
-                  'Semua Produk',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                // JUDUL SECTION
+                Text(
+                  // Judul berubah jika sedang mencari, menampilkan jumlah hasil
+                  searchQuery.isEmpty
+                      ? 'Semua Produk'
+                      : 'Hasil Pencarian (${visibleProducts.length})',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 12),
 
-                // Setiap baris berisi 2 produk (dibuat dari Row + Expanded)
-                for (int i = 0; i < daftarProduct.length; i += 2)
-                  // Padding: jarak bawah antar baris produk
+                // Pesan ditampilkan jika pencarian tidak menemukan produk apa pun
+                if (visibleProducts.isEmpty)
                   Padding(
-                    // EdgeInsets.only: jarak hanya di sisi bawah
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: Text(
+                        'Produk "$searchQuery" tidak ditemukan',
+                        style: TextStyle(color: Colors.grey.shade500),
+                      ),
+                    ),
+                  ),
+
+                // GRID PRODUK 2 KOLOM
+                // Dibangun dari visibleProducts (sudah difilter searchQuery),
+                // BUKAN dari widget.products langsung
+                for (int i = 0; i < visibleProducts.length; i += 2)
+                  Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    // Row: dua card produk berdampingan
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Expanded: card kiri mengisi setengah lebar
-                        Expanded(child: ProductCard(product: daftarProduct[i])),
-                        // SizedBox: jarak antar dua card
-                        const SizedBox(width: 12),
-                        // Expanded: card kanan (kosong jika jumlah produk ganjil)
                         Expanded(
-                          child: i + 1 < daftarProduct.length
-                              ? ProductCard(product: daftarProduct[i + 1])
+                          child: ProductCard(
+                            product: visibleProducts[i],
+                            // onAddToCart: diteruskan dari MyApp lewat
+                            // widget.keranjang, dipanggil saat tombol ditekan
+                            onAddToCart: () =>
+                                widget.keranjang.onAddToCart(visibleProducts[i]),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: i + 1 < visibleProducts.length
+                              ? ProductCard(
+                                  product: visibleProducts[i + 1],
+                                  onAddToCart: () => widget.keranjang
+                                      .onAddToCart(visibleProducts[i + 1]),
+                                )
                               : const SizedBox(),
                         ),
                       ],
@@ -176,62 +199,49 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // bottomNavigationBar: navigasi di bagian bawah halaman
       bottomNavigationBar: BottomNavigationBar(
-        // currentIndex: menu yang sedang aktif (Beranda)
         currentIndex: 0,
         selectedItemColor: warnaAksen,
         unselectedItemColor: Colors.grey,
-        // onTap: dipanggil setiap kali salah satu menu ditekan
         onTap: (index) {
           if (index == 1) {
-            // Navigator.push: membuka halaman CartPage di atas HomePage
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const CartPage()),
+              MaterialPageRoute(
+                builder: (context) => CartPage(keranjang: widget.keranjang),
+              ),
             );
           } else if (index == 2) {
-            // Navigator.push: membuka halaman ProfilePage di atas HomePage
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ProfilePage()),
+              MaterialPageRoute(
+                builder: (context) => ProfilePage(keranjang: widget.keranjang),
+              ),
             );
           }
-          // index == 0 (Beranda) tidak melakukan apa-apa karena sudah di halaman ini
         },
         items: [
-          // Item menu Beranda
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          // Item menu Keranjang, iconnya diberi badge jumlah barang
+          const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(
             // Stack: menumpuk icon keranjang dengan badge jumlah di sudutnya
             icon: Stack(
-              // clipBehavior none: agar badge boleh sedikit keluar dari area icon
               clipBehavior: Clip.none,
               children: [
-                // Icon keranjang ditulis lebih dulu sehingga berada di belakang/dasar
                 const Icon(Icons.shopping_cart),
                 // Positioned: menaruh badge di pojok kanan atas icon keranjang
                 Positioned(
                   right: -6,
                   top: -4,
-                  // Container: lingkaran kecil berisi angka jumlah item
                   child: Container(
                     padding: const EdgeInsets.all(3),
                     decoration: const BoxDecoration(
                       color: warnaAksen,
                       shape: BoxShape.circle,
                     ),
-                    constraints: const BoxConstraints(
-                      minWidth: 16,
-                      minHeight: 16,
-                    ),
-                    // Text: menampilkan total jumlah item di keranjang
+                    constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                    // Text: jumlah item di keranjang, berubah mengikuti state
                     child: Text(
-                      '${daftarKeranjang.length}',
+                      '${widget.keranjang.cart.length}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
@@ -245,18 +255,14 @@ class HomePage extends StatelessWidget {
             ),
             label: 'Keranjang',
           ),
-          // Item menu Profil
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
+          const BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
         ],
       ),
     );
   }
 }
 
-// KategoriItem : satu ikon kategori dengan label di bawahnya
+// KategoriItem 
 class KategoriItem extends StatelessWidget {
   final String nama;
   final IconData icon;
@@ -265,40 +271,37 @@ class KategoriItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Column: icon di atas, teks nama kategori di bawah
     return Column(
       children: [
-        // Container: lingkaran latar untuk icon kategori
         Container(
           width: 52,
           height: 52,
-          // alignment: menempatkan icon tepat di tengah lingkaran
           alignment: Alignment.center,
-          // BoxDecoration: warna latar dan bentuk lingkaran
-          decoration: BoxDecoration(
-            color: warnaAbuMuda,
-            shape: BoxShape.circle,
-          ),
-          // Icon: icon kategori
+          decoration: BoxDecoration(color: warnaAbuMuda, shape: BoxShape.circle),
           child: Icon(icon, color: warnaAksen),
         ),
-        // SizedBox: jarak antara icon dan teks
         const SizedBox(height: 6),
-        // Text: nama kategori
         Text(nama, style: const TextStyle(fontSize: 11)),
       ],
     );
   }
 }
 
-// ProductCard : card vertikal untuk satu produk
 class ProductCard extends StatelessWidget {
   final Product product;
+  final VoidCallback onAddToCart;
 
-  const ProductCard({super.key, required this.product});
+  const ProductCard({
+    super.key,
+    required this.product,
+    required this.onAddToCart,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // habis: true jika stok produk ini sudah 0
+    final habis = product.stock <= 0;
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
@@ -307,22 +310,28 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // GAMBAR PRODUK
+          // Container: bingkai gambar produk, sudut atas dibuat melengkung
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(9),
-            ),
-            child: SizedBox(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+            // Image.asset: menampilkan gambar produk dari folder assets
+            child: Image.asset(
+              product.imageUrl,
               width: double.infinity,
-              height: 110,
-              child: Image.asset(
-                product.imageUrl,
-                fit: BoxFit.cover,
-              ),
+              height: 100,
+              fit: BoxFit.cover,
+              // errorBuilder: gambar cadangan (icon) jika file belum ada
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: double.infinity,
+                  height: 100,
+                  alignment: Alignment.center,
+                  color: warnaAbuMuda,
+                  child: Icon(product.icon, size: 40, color: Colors.grey.shade500),
+                );
+              },
             ),
           ),
 
-          // Detail produk
           Padding(
             padding: const EdgeInsets.all(8),
             child: Column(
@@ -332,10 +341,7 @@ class ProductCard extends StatelessWidget {
                   product.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -349,16 +355,24 @@ class ProductCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       product.rating,
+                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                    ),
+                    const Spacer(),
+                    // Text: menampilkan sisa stok, ikut berubah tiap kali
+                    // tombol Tambah ditekan (menunjukkan data ini adalah state)
+                    Text(
+                      habis ? 'Stok habis' : 'Stok ${product.stock}',
                       style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade600,
+                        fontSize: 10,
+                        color: habis ? Colors.red : Colors.grey.shade500,
+                        fontWeight: habis ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  product.price,
+                  formatRupiah(product.price),
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -367,21 +381,22 @@ class ProductCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
 
-                // Tombol Tambah
-                Container(
+                SizedBox(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  decoration: BoxDecoration(
-                    color: warnaAksen,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Text(
-                    'Tambah',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                  child: ElevatedButton(
+                    onPressed: habis ? null : onAddToCart,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: warnaAksen,
+                      foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade300,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                    child: Text(
+                      habis ? 'Stok Habis' : 'Tambah',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
